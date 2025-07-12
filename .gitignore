@@ -2,3 +2,5 @@
 Backend/out/
 .venv
 scripts/lambda_cv_processing.zip
+cognito_config.json
+iam_arns.json

@@ -3,28 +3,28 @@ import zipfile
 import os
 import json
 import time
+from dotenv import load_dotenv
 
-LAMBDA_NAME = 'cvgram-cv-processing'  # Nome funzione Lambda su AWS
-LAMBDA_FILE = 'lambda_function.py'  # File python da zippare (es: lambda_helloworld.py o lambda_function.py)
-HANDLER = 'lambda_function.lambda_handler'  # handler (es: lambda_helloworld.lambda_handler o lambda_function.lambda_handler)
+load_dotenv()
 
 with open(os.path.join(os.path.dirname(__file__), '../iam_arns.json')) as f:
     arns = json.load(f)
-ROLE_ARN = arns['lambda_role_arn']
+
+REGION = os.getenv('REGION', 'eu-west-2')
+LAMBDA_NAME = 'cvgram-cv-processing'
+LAMBDA_FILE = 'lambda_function.py'
+HANDLER = 'lambda_function.lambda_handler'
 RUNTIME = 'python3.12'
 ZIP_FILE = 'lambda_cv_processing.zip'
-REGION = 'eu-west-2'
+ROLE_ARN = arns['lambda_role_arn']
 
 lambda_client = boto3.client('lambda', region_name=REGION)
 
-# 1. Crea lo zip della lambda
-
 def create_lambda_zip():
+    """Crea un file zip contenente il codice della Lambda."""
     with zipfile.ZipFile(ZIP_FILE, 'w') as zf:
         zf.write(LAMBDA_FILE)
-    print(f"✅ Creato {ZIP_FILE}")
-
-# 2. Crea o aggiorna la lambda
+    print(f"Creato {ZIP_FILE}")
 
 def deploy_lambda():
     with open(ZIP_FILE, 'rb') as f:

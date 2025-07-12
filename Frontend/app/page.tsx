@@ -12,7 +12,6 @@ import { useRouter } from "next/navigation"
 import { signIn, signUp, getCurrentUser, confirmSignUp } from 'aws-amplify/auth';
 import { configureAmplify } from "@/lib/amplify-config"
 
-// Configurazione di Amplify
 configureAmplify();
 
 export default function AuthPage() {
@@ -27,7 +26,6 @@ export default function AuthPage() {
   const [checkingAuth, setCheckingAuth] = useState(true)
 
   useEffect(() => {
-    // Check se l'utente è già loggato tramite
     getCurrentUser()
       .then(() => {
         router.push("/dashboard")
@@ -40,7 +38,6 @@ export default function AuthPage() {
     e.preventDefault()
     setLoading(true)
     if (isLogin) {
-      // Login
       try {
         await signIn({ username: email, password })
         router.push("/dashboard")
@@ -50,13 +47,11 @@ export default function AuthPage() {
         setLoading(false)
       }
     } else {
-      // Validate password confirmation
       if (password !== confirmPassword) {
         alert("Le password non corrispondono")
         setLoading(false)
         return
       }
-      // Registrazione
       try {
         await signUp({
           username: email,

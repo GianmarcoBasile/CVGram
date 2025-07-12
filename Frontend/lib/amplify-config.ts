@@ -6,13 +6,10 @@ import {
   cognitoClientId,
   cognitoIdentityPoolId,
 } from "@/config";
-import path from "path";
 
-// S3 bucket e regione
 export const s3BucketName = "cvgram-cv-bucket";
 export const s3Region = "eu-west-2";
 
-// Verifica se Amplify è già configurato
 let isConfigured = false;
 
 export function configureAmplify() {
@@ -42,5 +39,4 @@ export function configureAmplify() {
   }
 }
 
-// Esporta i valori di configurazione per riferimento diretto
 export { cognitoUserPoolId, cognitoClientId, cognitoIdentityPoolId };

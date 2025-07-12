@@ -1,5 +1,5 @@
 {
   "lambda_role_arn": "arn:aws:iam::177873418246:role/lambda-cv-upload-role",
   "backend_role_arn": "arn:aws:iam::177873418246:role/backend-cv-access-role",
-  "cognito_auth_role_arn": "arn:aws:iam::177873418246:role/CVGramIdentityPoolAuthRole"
+  "cognito_auth_role_arn": "arn:aws:iam::177873418246:role/identity-pool-auth-role"
 }

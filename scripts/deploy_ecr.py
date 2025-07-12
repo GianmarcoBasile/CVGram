@@ -1,9 +1,13 @@
 
 import subprocess
 import json
+from dotenv import load_dotenv
+import os
 
-REPO_NAME = "cvgram-backend"
-AWS_REGION = "eu-west-2"
+load_dotenv()
+
+AWS_REGION = os.getenv('REGION', 'eu-west-2')
+REPO_NAME = os.getenv('ECR_REPO_NAME', 'cvgram-backend')
 
 def run(cmd, check=True):
     print(f"$ {cmd}")
@@ -11,33 +15,27 @@ def run(cmd, check=True):
     return result
 
 def main():
-    print(f"Verifico se il repository {REPO_NAME} esiste su ECR...")
+    print(f"Verifico se il repository {REPO_NAME} esiste su ECR")
     try:
         run(f"aws ecr describe-repositories --repository-names {REPO_NAME} --region {AWS_REGION}")
     except subprocess.CalledProcessError:
-        print(f"Creo il repository {REPO_NAME} su ECR...")
+        print(f"Creo il repository {REPO_NAME} su ECR")
         run(f"aws ecr create-repository --repository-name {REPO_NAME} --region {AWS_REGION}")
-
-    # 2. Ottieni URI repo
     
     res = subprocess.check_output(f"aws ecr describe-repositories --repository-names {REPO_NAME} --region {AWS_REGION}", shell=True)
     repo_uri = json.loads(res)["repositories"][0]["repositoryUri"]
     print(f"Repository URI: {repo_uri}")
 
-    # 3. Build docker image
-    print("Build dell'immagine Docker...")
+    print("Build dell'immagine Docker")
     run(f"docker build -t {REPO_NAME}:latest ../Backend")
 
-    # 4. Tag
-    print("Tag dell'immagine...")
+    print("Tag dell'immagine")
     run(f"docker tag {REPO_NAME}:latest {repo_uri}:latest")
 
-    # 5. Login ECR
-    print("Login a ECR...")
+    print("Login a ECR")
     run(f"aws ecr get-login-password --region {AWS_REGION} | docker login --username AWS --password-stdin {repo_uri}")
 
-    # 6. Push
-    print("Push dell'immagine su ECR...")
+    print("Push dell'immagine su ECR")
     run(f"docker push {repo_uri}:latest")
 
     print("Deploy ECR completato!")

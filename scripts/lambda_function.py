@@ -20,27 +20,26 @@ def lambda_handler(event, context):
     head = s3.head_object(Bucket=bucket, Key=key)
     logger.info(f"Bucket: {bucket}, Key: {key}, Size: {head['ContentLength']} bytes, Content-Type: {head['ContentType']}")
 
-    # Attendi 2 secondi per sicurezza (replica S3)
     time.sleep(2)
-
+    
     # Textract
     response = textract.detect_document_text(
         Document={'S3Object': {'Bucket': bucket, 'Name': key}}
     )
+    
     logger.info(f"Risposta Textract: {response}")
-    # Estrazione testo: prima LINE, fallback WORD (campo corretto: 'Text')
+    
+    # Estrazione testo
     lines = [item.get('Text', '') for item in response['Blocks'] if item['BlockType'] == 'LINE']
     if lines:
         text = ' '.join(lines)
     else:
         words = [item.get('Text', '') for item in response['Blocks'] if item['BlockType'] == 'WORD']
         text = ' '.join(words)
-        logger.warning("Nessun blocco LINE trovato, usati blocchi WORD.")
-    logger.info(f"Testo estratto: {text[:5000]}...")
-
+    logger.info(f"Testo estratto: {text[:200]}...")
     logger.info(f"User Email: {head['Metadata']}")
 
-    # DynamoDB
+    # Carica i dati su DynamoDB
     table.put_item(Item={
         'cv_id': key,
         'email': head['Metadata'].get('email'),

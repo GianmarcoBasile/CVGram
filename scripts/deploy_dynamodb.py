@@ -1,7 +1,13 @@
 import boto3
 from botocore.exceptions import ClientError
+from dotenv import load_dotenv
+import os
 
-dynamodb = boto3.resource('dynamodb', region_name='eu-west-2')
+load_dotenv()
+
+AWS_REGION = os.getenv('REGION', 'eu-west-2')
+
+dynamodb = boto3.resource('dynamodb', region_name=AWS_REGION)
 
 def create_cv_table():
     try:
