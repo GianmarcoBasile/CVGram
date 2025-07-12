@@ -1,0 +1,35 @@
+name: Frontend Linting & Formatting
+on:
+  pull_request:
+    paths:
+      - "Frontend/**.ts"
+      - "Frontend/**.tsx"
+      - "Frontend/**.js"
+      - "Frontend/**.jsx"
+  push:
+    paths:
+      - "Frontend/**.ts"
+      - "Frontend/**.tsx"
+      - "Frontend/**.js"
+      - "Frontend/**.jsx"
+
+jobs:
+  lint-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install dependencies
+        run: cd Frontend && npm install
+
+      - name: Run prettier (check mode)
+        run: cd Frontend && npm run prettier --check "**/*.{ts,tsx,js,jsx}"
+
+      - name: Run lint
+        run: cd Frontend && npm run lint

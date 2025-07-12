@@ -1,0 +1,31 @@
+name: Backend Python Linting
+on:
+  pull_request:
+    paths:
+      - "Backend/**.py"
+      - "scripts/**.py"
+  push:
+    paths:
+      - "Backend/**.py"
+      - "scripts/**.py"
+
+jobs:
+  lint-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r Backend/requirements.txt -r scripts/requirements.txt black flake8
+
+      - name: Run black on backend
+        run: black --check Backend/ scripts/
+
+      - name: Run flake8 (lint)
+        run: flake8 Backend/ scripts/
