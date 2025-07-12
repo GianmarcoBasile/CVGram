@@ -37,6 +37,9 @@ jobs:
       - name: Install backend dependencies
         run: pip install -r Backend/requirements.txt
 
+      - name: Fix permissions for Backend/out
+        run: chmod -R 755 Backend/out
+
       - name: Start backend in background
         run: |
           nohup python Backend/main.py &
