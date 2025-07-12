@@ -26,7 +26,7 @@ jobs:
           node-version: "22"
 
       - name: Install dependencies
-        run: cd Frontend && npm install
+        run: cd Frontend && npm install --legacy-peer-deps
 
       - name: Run prettier (check mode)
         run: cd Frontend && npm run prettier --check "**/*.{ts,tsx,js,jsx}"

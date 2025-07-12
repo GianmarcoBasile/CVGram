@@ -20,7 +20,7 @@ jobs:
           node-version: "22"
 
       - name: Install frontend dependencies
-        run: cd Frontend && npm install
+        run: cd Frontend && npm install --legacy-peer-deps
 
       - name: Build frontend
         run: cd Frontend && npm run build
