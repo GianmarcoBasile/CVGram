@@ -30,7 +30,6 @@ def get_user_pool_by_name(pool_name):
 def get_user_pool_client_by_name(user_pool_id, client_name):
     response = cognito.list_user_pool_clients(UserPoolId=user_pool_id, MaxResults=60)
     for client in response["UserPoolClients"]:
-        # Recupera i dettagli per confrontare il nome
         client_details = cognito.describe_user_pool_client(
             UserPoolId=user_pool_id, ClientId=client["ClientId"]
         )
@@ -108,7 +107,7 @@ def create_identity_pool(user_pool_id, client_id):
                 {
                     "ProviderName": provider_name,
                     "ClientId": client_id,
-                    "ServerSideTokenCheck": False,
+                    "ServerSideTokenCheck": True,
                 }
             ],
         )

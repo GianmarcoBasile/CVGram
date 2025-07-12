@@ -1,5 +1,4 @@
 name: Build & Push Flask Backend to ECR
-
 on:
   push:
     branches: [master]

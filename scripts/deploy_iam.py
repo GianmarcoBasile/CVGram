@@ -32,7 +32,6 @@ LAMBDA_POLICY = {
             "Resource": "arn:aws:s3:::cvgram-cv-bucket/*",
         },
         {"Effect": "Allow", "Action": ["textract:*"], "Resource": "*"},
-        {"Effect": "Allow", "Action": ["comprehend:*"], "Resource": "*"},
         {
             "Effect": "Allow",
             "Action": ["dynamodb:PutItem", "dynamodb:UpdateItem"],
