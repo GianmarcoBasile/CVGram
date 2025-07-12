@@ -1,4 +1,4 @@
-name: Backend Python Formatting
+name: Backend Python Linting
 on:
   pull_request:
     paths:
@@ -10,7 +10,7 @@ on:
       - "scripts/**.py"
 
 jobs:
-  format-backend:
+  lint-backend:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -22,7 +22,7 @@ jobs:
           python-version: "3.12"
 
       - name: Install dependencies
-        run: pip install -r Backend/requirements.txt -r scripts/requirements.txt black flake8
+        run: pip install -r Backend/requirements.txt -r scripts/requirements.txt flake8
 
       - name: Run black on backend
-        run: python -m black --check Backend/*.py scripts/*.py
+        run: python -m flake8 --check Backend/ scripts/
