@@ -1,0 +1,4 @@
+**/.env
+Backend/out/
+.venv
+scripts/lambda_cv_processing.zip
