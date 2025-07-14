@@ -24,8 +24,9 @@ jobs:
 
       - name: Build Frontend
         run: |
-          python scripts/update_frontend_cognito.py
-          cd Frontend
+          cd scripts
+          python update_frontend_cognito.py
+          cd ../Frontend
           npm install
           npm run build
           mv out ../Backend
