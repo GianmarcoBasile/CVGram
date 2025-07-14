@@ -27,7 +27,7 @@ jobs:
           cd scripts
           python update_frontend_cognito.py
           cd ../Frontend
-          npm install
+          npm install --legacy-peer-deps
           npm run build
           mv out ../Backend
           cd ..
