@@ -1,3 +1,4 @@
+import json
 import socket
 import boto3
 import botocore
@@ -23,7 +24,7 @@ ec2 = boto3.client("ec2", region_name=AWS_REGION)
 
 USER_DATA = """#!/bin/bash
 sudo apt-get update
-sudo apt-get install ca-certificates curl awscli -y
+sudo apt-get install ca-certificates curl awscli python3-pip -y
 sudo install -m 0755 -d /etc/apt/keyrings
 sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
 sudo chmod a+r /etc/apt/keyrings/docker.asc
@@ -144,7 +145,7 @@ def create_ec2_instance(ami_id, instance_type, name, security_group_id, user_dat
     desc = ec2.describe_instances(InstanceIds=[instance_id])
     public_ip = desc["Reservations"][0]["Instances"][0].get("PublicIpAddress")
     print(f"IP pubblico EC2: {public_ip}")
-    return public_ip
+    return instance_id, public_ip
 
 
 def wait_for_tools(ip, key_path, timeout=300):
@@ -202,6 +203,30 @@ def post_deploy_ec2(instances_ip, master_ip):
                 "177873418246.dkr.ecr.eu-west-2.amazonaws.com/cvgram-backend:latest",
             ]
             subprocess.run(cmd_create_service, check=True)
+            cmd_send_web_hook = [
+                "scp",
+                "-i",
+                key_path,
+                "web_hook_server.py",
+                f"ubuntu@{ip}:/home/ubuntu/webhook.py",
+            ]
+            subprocess.run(cmd_send_web_hook, check=True)
+            cmd_install_flask = [
+                "ssh",
+                "-i",
+                key_path,
+                f"ubuntu@{ip}",
+                "pip install flask",
+            ]
+            subprocess.run(cmd_install_flask, check=True)
+            cmd_start_webhook = [
+                "ssh",
+                "-i",
+                key_path,
+                f"ubuntu@{ip}",
+                "nohup python3 /home/ubuntu/webhook.py > webhook.log 2>&1 &"
+            ]
+            subprocess.run(cmd_start_webhook, check=True)
 
 
 if __name__ == "__main__":
@@ -209,11 +234,26 @@ if __name__ == "__main__":
     key_path = os.path.expanduser("~/.ssh/" + key_name + ".pem")
     create_key_pair(key_name, key_path)
     sg_id = create_security_group(SECURITY_GROUP_NAME, SECURITY_GROUP_DESC)
-    public_ip_master = create_ec2_instance(
+    instance_id_master, public_ip_master = create_ec2_instance(
         AMI_ID_MASTER, INSTANCE_TYPE_MASTER, "master", sg_id, USER_DATA
     )
-    public_ip_worker = create_ec2_instance(
+    instance_id_worker, public_ip_worker = create_ec2_instance(
         AMI_ID_WORKER, INSTANCE_TYPE_WORKER, "worker", sg_id, USER_DATA
     )
+
     instances_ip = [public_ip_master, public_ip_worker]
     post_deploy_ec2(instances_ip, public_ip_master)
+
+    output = {
+        "master": {
+            "instance_id": instance_id_master,
+            "public_ip": public_ip_master,
+        },
+        "workers": {
+            "instance_id": instance_id_worker,
+            "public_ip": public_ip_worker,
+        },
+    }
+
+    with open("../ec2.json", "w") as f:
+        json.dump(output, f, indent=2)

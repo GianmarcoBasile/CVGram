@@ -1,0 +1,10 @@
+{
+  "master": {
+    "instance_id": "i-0c6f6eecba429a1c2",
+    "public_ip": "35.179.117.167"
+  },
+  "workers": {
+    "instance_id": "i-0a2b3a043910fa49c",
+    "public_ip": "13.43.86.44"
+  }
+}
