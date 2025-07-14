@@ -22,6 +22,15 @@ jobs:
         run: |
           aws ecr get-login-password --region eu-west-2 | docker login --username AWS --password-stdin $(aws ecr describe-repositories --repository-names cvgram-backend --region eu-west-2 --query 'repositories[0].repositoryUri' --output text)
 
+      - name: Build Frontend
+        run: |
+          python scripts/update_frontend_cognito.py
+          cd Frontend
+          npm install
+          npm run build
+          mv out ../Backend
+          cd ..
+
       - name: Build Docker image
         run: docker build -t cvgram-backend:latest ./Backend
 
