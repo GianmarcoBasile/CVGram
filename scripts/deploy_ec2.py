@@ -39,21 +39,22 @@ sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin 
 
 
 """
+    
+def wait_for_tools(ip, key_path, timeout=300):
+    import time
 
-
-def wait_for_ssh(ip, port=22, timeout=300):
-    print(f"Attendo che SSH sia disponibile su {ip}...")
     start = time.time()
     while time.time() - start < timeout:
-        try:
-            with socket.create_connection((ip, port), timeout=5):
-                print("SSH disponibile!")
-                return
-        except Exception:
-            time.sleep(5)
+        print(f"Controllo installazione awscli e docker su {ip}...")
+        ssh_cmd = ["ssh", "-i", key_path, f"ubuntu@{ip}", "which aws && which docker"]
+        result = subprocess.run(ssh_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        if result.returncode == 0:
+            print("awscli e docker installati!")
+            return True
+        time.sleep(5)
     raise TimeoutError(
-        f"ERRORE Timeout: SSH non disponibile su {ip} dopo {timeout} secondi."
-    )
+        f"Timeout: awscli e docker non installati su {ip} dopo {timeout} secondi."
+    )    
 
 
 def create_security_group(security_group_name, security_group_desc):
@@ -147,24 +148,6 @@ def create_ec2_instance(ami_id, instance_type, name, security_group_id, user_dat
     print(f"IP pubblico EC2: {public_ip}")
     return instance_id, public_ip
 
-
-def wait_for_tools(ip, key_path, timeout=300):
-    import time
-
-    start = time.time()
-    while time.time() - start < timeout:
-        print(f"Controllo installazione awscli e docker su {ip}...")
-        ssh_cmd = ["ssh", "-i", key_path, f"ubuntu@{ip}", "which aws && which docker"]
-        result = subprocess.run(ssh_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        if result.returncode == 0:
-            print("awscli e docker installati!")
-            return True
-        time.sleep(5)
-    raise TimeoutError(
-        f"Timeout: awscli e docker non installati su {ip} dopo {timeout} secondi."
-    )
-
-
 def post_deploy_ec2(instances_ip, master_ip):
     key_path = os.path.expanduser(f"~/.ssh/{KEY_NAME}.pem")
     ecr_login_cmd = "aws ecr get-login-password --region eu-west-2 | docker login --username AWS --password-stdin 177873418246.dkr.ecr.eu-west-2.amazonaws.com"
@@ -246,12 +229,10 @@ if __name__ == "__main__":
 
     output = {
         "master": {
-            "instance_id": instance_id_master,
-            "public_ip": public_ip_master,
+            "instance_id": instance_id_master
         },
         "workers": {
-            "instance_id": instance_id_worker,
-            "public_ip": public_ip_worker,
+            "instance_id": instance_id_worker
         },
     }
 

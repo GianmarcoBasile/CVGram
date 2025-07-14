@@ -85,10 +85,10 @@ def get_cvs():
             results = []
             if keyword_list:
                 from functools import reduce
-                from operator import or_
+                from operator import and_
 
                 filters = [Attr("text").contains(k) for k in keyword_list]
-                keyword_filter = reduce(or_, filters)
+                keyword_filter = reduce(and_, filters)
                 response = cv_table.scan(FilterExpression=keyword_filter)
                 results = response["Items"]
                 # Gestione della paginazione per grandi set di dati
