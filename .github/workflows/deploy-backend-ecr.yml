@@ -37,7 +37,7 @@ jobs:
 
       - name: Notify deploy
         run: |
-          MASTER_IP=$(jq -r '.master.public_ip' ../ec2.json)
+          MASTER_IP=$(jq -r '.master.public_ip' ec2.json)
           REPO_URI=$(aws ecr describe-repositories --repository-names cvgram-backend --region eu-west-2 --query 'repositories[0].repositoryUri' --output text)
           curl -X POST http://$MASTER_IP:5000/webhook \
             -H "Content-Type: application/json" \
