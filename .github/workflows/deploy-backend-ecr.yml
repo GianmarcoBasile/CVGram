@@ -47,7 +47,7 @@ jobs:
 
       - name: Notify deploy
         run: |
-          MASTER_IP=$(jq -r '.master.public_ip' ec2.json)
+          MASTER_IP=$(aws ec2 describe-instances --instance-ids $(jq -r '.master.instance_id' ec2.json) --query 'Reservations[0].Instances[0].PublicIpAddress' --output text)
           REPO_URI=$(aws ecr describe-repositories --repository-names cvgram-backend --region eu-west-2 --query 'repositories[0].repositoryUri' --output text)
           echo "Notifying $MASTER_IP about the deploy with image: $REPO_URI:latest"
           curl -X POST http://$MASTER_IP:5000/webhook \
