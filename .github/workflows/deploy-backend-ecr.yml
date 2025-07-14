@@ -39,7 +39,7 @@ jobs:
         run: |
           MASTER_IP=$(jq -r '.master.public_ip' ec2.json)
           REPO_URI=$(aws ecr describe-repositories --repository-names cvgram-backend --region eu-west-2 --query 'repositories[0].repositoryUri' --output text)
-          echo "Notifying deploy with image: $REPO_URI:latest"
+          echo "Notifyingg deploy with image: $REPO_URI:latest"
           curl -X POST http://$MASTER_IP:5000/webhook \
             --max-time 10 \
             -H "Content-Type: application/json" \
